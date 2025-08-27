@@ -12,6 +12,9 @@ import sys
 from enum import Enum, auto
 import random
 
+# Import the ASCII art manager (in practice, this would be: from ascii_art import AsciiArt, ArtType)
+# For this artifact, we'll need to include it or reference it appropriately
+
 # Type aliases for better readability
 CommandFunction: TypeAlias = Callable[["GameState", list[str]], "GameResult"]
 ItemDict: TypeAlias = dict[str, "Item"]
@@ -28,6 +31,98 @@ class Direction(Enum):
     NORTHWEST = "northwest"
     SOUTHEAST = "southeast"
     SOUTHWEST = "southwest"
+
+# Note: In practice, you would import AsciiArt from the separate ascii_art.py module
+# from ascii_art import AsciiArt, ArtType
+
+# For this demonstration, we'll create a simple reference class
+class AsciiArt:
+    """
+    Simplified ASCII art reference class.
+    In practice, import this from ascii_art.py module.
+    """
+    @staticmethod
+    def get_game_banner() -> str:
+        return """
+╔══════════════════════════════════════════════════════════╗
+║                                                          ║
+║    ██████╗ ██╗   ██╗███╗   ██╗███╗   ██╗███████╗████████║
+║    ██╔══██╗██║   ██║████╗  ██║████╗  ██║██╔════╝╚══██╔══║
+║    ██║  ██║██║   ██║██╔██╗ ██║██╔██╗ ██║█████╗     ██║  ║
+║    ██║  ██║██║   ██║██║╚██╗██║██║╚██╗██║██╔══╝     ██║  ║
+║    ██████╔╝╚██████╔╝██║ ╚████║██║ ╚████║███████╗   ██║  ║
+║    ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═══╝╚══════╝   ╚═╝  ║
+║                                                          ║
+║               A D V E N T U R E   G A M E                ║
+║                                                          ║
+╚══════════════════════════════════════════════════════════╝
+        """
+    
+    @staticmethod
+    def center_art(art: str) -> str:
+        """Simple centering - in practice, use the full implementation from ascii_art.py"""
+        return art
+    
+    @staticmethod
+    def get_room_art(room_id: str) -> str:
+        """Get room art - in practice, use the full implementation from ascii_art.py"""
+        return ""  # Simplified for this example
+    
+    @staticmethod
+    def get_item_art(item_name: str) -> str:
+        """Get item art - in practice, use the full implementation from ascii_art.py"""
+        return ""  # Simplified for this example
+    
+    @staticmethod
+    def get_inventory_header() -> str:
+        return "┌─ 🎒 YOUR INVENTORY 🎒 ─┐"
+    
+    @staticmethod
+    def get_inventory_footer() -> str:
+        return "└────────────────────────┘"
+    
+    @staticmethod
+    def get_score_display(score: int, moves: int) -> str:
+        return f"""
+┌─ 📊 GAME STATS 📊 ─┐
+│ Score: {score:>3} points  │
+│ Moves: {moves:>3} steps   │
+└──────────────────────┘
+        """
+    
+    @staticmethod
+    def get_help_banner() -> str:
+        return """
+╔═══════════════════════════════════╗
+║         🆘 HELP SYSTEM 🆘         ║
+╚═══════════════════════════════════╝
+        """
+    
+    @staticmethod
+    def get_victory_art() -> str:
+        return """
+    ✨🎉 CONGRATULATIONS! 🎉✨
+    
+    ██╗   ██╗ ██████╗ ██╗   ██╗
+    ╚██╗ ██╔╝██╔═══██╗██║   ██║
+     ╚████╔╝ ██║   ██║██║   ██║
+      ╚██╔╝  ██║   ██║██║   ██║
+       ██║   ╚██████╔╝╚██████╔╝
+       ╚═╝    ╚═════╝  ╚═════╝
+    
+    ██╗    ██╗ ██████╗ ███╗   ██╗
+    ██║    ██║██╔═══██╗████╗  ██║
+    ██║ █╗ ██║██║   ██║██╔██╗ ██║
+    ██║███╗██║██║   ██║██║╚██╗██║
+    ╚███╔███╔╝╚██████╔╝██║ ╚████║
+     ╚══╝╚══╝  ╚═════╝ ╚═╝  ╚═══╝
+    
+       🏆 DUNNET MASTER! 🏆
+        """
+    
+    @staticmethod
+    def get_separator(char: str = "═") -> str:
+        return char * 50
 
 @dataclass(frozen=True)
 class GameResult:
@@ -207,26 +302,41 @@ class DunnetGame:
         # Mark room as visited
         room.visited = True
         
-        # Build description
-        description = [f"**{room.name}**", "", room.description]
+        # Build description with ASCII art
+        description_parts = []
+        
+        # Add room ASCII art
+        room_art = AsciiArt.get_room_art(state.current_room)
+        if room_art:
+            description_parts.append(room_art)
+            description_parts.append("")
+        
+        # Add room description
+        description_parts.extend([f"**{room.name}**", "", room.description])
         
         # Add items
         visible_items = [item for item in room.items 
                         if item in self.state.items]
         if visible_items:
-            description.append("")
-            description.append("You can see:")
+            description_parts.append("")
+            description_parts.append("🔍 **You can see:**")
             for item_name in visible_items:
                 item = self.state.items[item_name]
-                description.append(f"  - {item.description}")
+                description_parts.append(f"   • {item.description}")
         
-        # Add exits
+        # Add exits with directional arrows
         if room.exits:
-            description.append("")
-            exits = [direction.value for direction in room.exits.keys()]
-            description.append(f"Exits: {', '.join(exits)}")
+            description_parts.append("")
+            exit_symbols = {
+                Direction.NORTH: "↑ north", Direction.SOUTH: "↓ south",
+                Direction.EAST: "→ east", Direction.WEST: "← west", 
+                Direction.UP: "⬆ up", Direction.DOWN: "⬇ down"
+            }
+            exits = [exit_symbols.get(direction, direction.value) 
+                    for direction in room.exits.keys()]
+            description_parts.append(f"🚪 **Exits:** {', '.join(exits)}")
         
-        return GameResult("\n".join(description))
+        return GameResult("\n".join(description_parts))
     
     def _examine(self, state: GameState, args: list[str]) -> GameResult:
         """Examine an item or room feature"""
@@ -247,7 +357,34 @@ class DunnetGame:
         if item.name not in room.items and item.name not in state.inventory:
             return GameResult(f"You don't see any '{target}' here.")
         
-        return GameResult(item.description)
+        # Build examination result with ASCII art
+        result_parts = []
+        
+        # Add item ASCII art
+        item_art = AsciiArt.get_item_art(item.name)
+        if item_art:
+            result_parts.append(item_art)
+            result_parts.append("")
+        
+        # Add item description
+        result_parts.append(f"**{item.name.title()}**")
+        result_parts.append(item.description)
+        
+        # Add item properties
+        properties = []
+        if item.portable:
+            properties.append("📦 Portable")
+        else:
+            properties.append("🏗️ Fixed in place")
+            
+        if item.usable:
+            properties.append("⚙️ Usable")
+            
+        if properties:
+            result_parts.append("")
+            result_parts.append(f"Properties: {', '.join(properties)}")
+        
+        return GameResult("\n".join(result_parts))
     
     def _take(self, state: GameState, args: list[str]) -> GameResult:
         """Take an item"""
@@ -296,16 +433,30 @@ class DunnetGame:
         return GameResult(f"You drop the {item.name}.")
     
     def _inventory(self, state: GameState, args: list[str]) -> GameResult:
-        """Show inventory"""
+        """Show inventory with ASCII art"""
         if not state.inventory:
-            return GameResult("You are carrying nothing.")
+            return GameResult("""
+┌─ 🎒 YOUR INVENTORY 🎒 ─┐
+│                       │
+│     *empty pockets*   │
+│                       │
+└───────────────────────┘
+            """.strip())
         
-        items_desc = []
-        for item_name in state.inventory:
+        # Build decorated inventory display
+        result_parts = [AsciiArt.get_inventory_header()]
+        
+        for i, item_name in enumerate(state.inventory, 1):
             item = state.items[item_name]
-            items_desc.append(f"  - {item.name}")
+            # Add item with number and icon
+            icon = "🎒" if item.portable else "⚙️"
+            result_parts.append(f"│ {i}. {icon} {item.name}")
         
-        return GameResult("You are carrying:\n" + "\n".join(items_desc))
+        result_parts.append(AsciiArt.get_inventory_footer())
+        result_parts.append("")
+        result_parts.append(f"💼 **Carrying {len(state.inventory)} item(s)**")
+        
+        return GameResult("\n".join(result_parts))
     
     def _go(self, state: GameState, args: list[str]) -> GameResult:
         """Go in a specified direction"""
@@ -421,26 +572,79 @@ class DunnetGame:
         return GameResult("You dig around but find nothing interesting.")
     
     def _help(self, state: GameState, args: list[str]) -> GameResult:
-        """Show help information"""
-        help_text = """
-**Dunnet Adventure Game Commands:**
-
-**Movement:** north (n), south (s), east (e), west (w), up (u), down (d)
-**Items:** take [item], drop [item], examine [item], inventory (i)
-**Actions:** use [item], turn on/off [item], dig
-**Game:** look (l), help, score, quit (q)
-
-**Tips:**
-- Examine everything you find
-- Some areas might be dark - you'll need light
-- Try digging in interesting places
-- Your goal is to explore and increase your score!
-        """
-        return GameResult(help_text.strip())
+        """Show help information with ASCII art"""
+        help_parts = [
+            AsciiArt.get_help_banner(),
+            "",
+            "**Movement Commands:**",
+            "🧭 north (n), south (s), east (e), west (w), up (u), down (d)",
+            "",
+            "**Item Commands:**",
+            "📦 take [item] - Pick up an item",
+            "📤 drop [item] - Drop an item from inventory", 
+            "🔍 examine [item] - Look closely at something",
+            "🎒 inventory (i) - Check what you're carrying",
+            "",
+            "**Action Commands:**",
+            "⚙️ use [item] - Use an item from inventory",
+            "💡 turn on/off [item] - Control devices",
+            "🏗️ dig - Dig with a shovel (if you have one)",
+            "",
+            "**Game Commands:**",
+            "👁️ look (l) - Look around current location",
+            "🆘 help - Show this help message",
+            "📊 score - Check your progress", 
+            "🚪 quit (q) - Exit the game",
+            "",
+            AsciiArt.get_separator("─"),
+            "",
+            "**💡 Pro Tips:**",
+            "• Examine everything you find - details matter!",
+            "• Some areas are dark - you'll need light to see",
+            "• Try digging in places that seem interesting",
+            "• Your goal is to explore and increase your score!",
+            "",
+            "**🎯 Current Mission:** Find the secret chamber and collect the key!"
+        ]
+        
+        return GameResult("\n".join(help_parts))
     
     def _score(self, state: GameState, args: list[str]) -> GameResult:
-        """Show current score"""
-        return GameResult(f"Score: {state.score} points in {state.moves} moves")
+        """Show current score with ASCII art"""
+        score_display = AsciiArt.get_score_display(state.score, state.moves)
+        
+        # Add progress indicators
+        progress_parts = [score_display, ""]
+        
+        # Calculate progress percentage (arbitrary max score for demo)
+        max_score = 100
+        progress_percent = min(100, (state.score / max_score) * 100)
+        progress_bars = int(progress_percent / 10)
+        progress_empty = 10 - progress_bars
+        
+        progress_bar = "▓" * progress_bars + "░" * progress_empty
+        progress_parts.append(AsciiArt.center_art(f"Progress: [{progress_bar}] {progress_percent:.0f}%"))
+        
+        # Add achievement hints
+        achievements = []
+        if state.score >= 10:
+            achievements.append("🏆 Item Collector")
+        if state.score >= 25:
+            achievements.append("🗺️ Explorer") 
+        if state.score >= 50:
+            achievements.append("🕵️ Detective")
+        if len(state.inventory) >= 3:
+            achievements.append("🎒 Pack Rat")
+        if "secret" in [room.name.lower() for room in state.rooms.values() if room.visited]:
+            achievements.append("🔍 Secret Finder")
+        
+        if achievements:
+            progress_parts.append("")
+            progress_parts.append("🏅 **Achievements Unlocked:**")
+            for achievement in achievements:
+                progress_parts.append(f"   {achievement}")
+        
+        return GameResult("\n".join(progress_parts))
     
     def _quit(self, state: GameState, args: list[str]) -> GameResult:
         """Quit the game"""
@@ -467,11 +671,16 @@ class DunnetGame:
         if (self.state.current_room == "secret" and 
             "key" in self.state.inventory and 
             self.state.score >= 50):
-            return GameResult(
-                result.message + "\n\n🎉 **CONGRATULATIONS!** You've won the game! " +
-                f"Final score: {self.state.score} points!",
-                game_over=True
-            )
+            victory_message = "\n".join([
+                result.message,
+                "",
+                AsciiArt.get_victory_art(),
+                "",
+                f"🎉 **FINAL SCORE: {self.state.score} points in {self.state.moves} moves!** 🎉",
+                "",
+                "You have mastered the mysteries of Dunnet!"
+            ])
+            return GameResult(victory_message, game_over=True)
         
         return result
     
@@ -485,22 +694,29 @@ class DunnetGame:
         return GameResult(f"I don't understand that command. {random.choice(suggestions)}")
 
 def main() -> None:
-    """Main game loop"""
-    print("🏠 **DUNNET ADVENTURE GAME** 🏠")
-    print("=" * 40)
-    print("Welcome to Dunnet! Type 'help' for commands or 'quit' to exit.")
-    print("=" * 40)
+    """Main game loop with ASCII art"""
+    # Clear screen and show banner
+    print("\033[2J\033[H")  # ANSI clear screen
+    print(AsciiArt.get_game_banner())
+    print()
+    print(AsciiArt.center_art("Welcome to Dunnet! Type 'help' for commands or 'quit' to exit."))
+    print(AsciiArt.get_separator())
+    print()
+    print("📝 Note: For the full ASCII art experience, save ascii_art.py separately")
+    print("    and import with: from ascii_art import AsciiArt")
+    print()
     
     game = DunnetGame()
     
     # Show initial room
     result = game._look(game.state, [])
-    print(f"\n{result.message}\n")
+    print(result.message)
+    print()
     
     # Main game loop
     while not game.state.game_over:
         try:
-            user_input = input("> ").strip()
+            user_input = input("🎮 > ").strip()
             if not user_input:
                 continue
                 
@@ -511,10 +727,12 @@ def main() -> None:
                 break
                 
         except KeyboardInterrupt:
-            print("\n\nGoodbye!")
+            print("\n")
+            print(AsciiArt.center_art("Thanks for playing Dunnet! 👋"))
             break
         except EOFError:
-            print("\n\nGoodbye!")
+            print("\n")
+            print(AsciiArt.center_art("Thanks for playing Dunnet! 👋"))
             break
 
 if __name__ == "__main__":

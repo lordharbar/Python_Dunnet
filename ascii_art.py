@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 """
 ASCII Art Manager for Dunnet Adventure Game
 Stores and manages all game artwork and visual elements
