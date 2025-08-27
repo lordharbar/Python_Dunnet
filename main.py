@@ -12,9 +12,6 @@ import sys
 from enum import Enum, auto
 import random
 
-# Import the ASCII art manager (in practice, this would be: from ascii_art import AsciiArt, ArtType)
-# For this artifact, we'll need to include it or reference it appropriately
-
 # Type aliases for better readability
 CommandFunction: TypeAlias = Callable[["GameState", list[str]], "GameResult"]
 ItemDict: TypeAlias = dict[str, "Item"]
