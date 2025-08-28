@@ -48,7 +48,7 @@ Type commands like a civilized person:
 
 - **Multiple rooms** to explore (more than a studio apartment!)
 - **Items to collect** and actually use (revolutionary!)
-- **Puzzles to solve** (nothing too brain-bending, we promise)
+- **Puzzles to solve** (nothing too brain-bending..)
 - **A scoring system** (for bragging rights)
 - **Win condition** (yes, you can actually beat this game)
 
@@ -106,7 +106,7 @@ MIT - Do whatever you want with this code. Build an empire, teach your kids, use
 ## FAQ
 
 **Q: Is this better than modern games?**  
-A: Define "better". Does it have ray tracing? No. Will it run on a potato? Absolutely.
+A: Define "better". Does it have ray tracing? No. Will it run on a potato?.
 
 **Q: How long does it take to complete?**  
 A: Anywhere from 10 minutes to 3 hours, depending on how thoroughly you explore and how often you get distracted trying to `examine` everything.

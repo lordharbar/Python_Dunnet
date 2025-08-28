@@ -12,6 +12,59 @@ import sys
 from enum import Enum, auto
 import random
 
+# Import the ASCII art manager
+try:
+    from ascii_art import AsciiArt, ArtType
+except ImportError:
+    # Fallback for when ascii_art.py is not available
+    print("Warning: ascii_art.py not found. Running with minimal ASCII art.")
+    
+    class AsciiArt:
+        """Minimal fallback ASCII art class"""
+        @staticmethod
+        def get_game_banner() -> str:
+            return "=== DUNNET ADVENTURE GAME ==="
+        
+        @staticmethod
+        def center_art(art: str) -> str:
+            return art
+        
+        @staticmethod
+        def get_room_art(room_id: str) -> str:
+            return ""
+        
+        @staticmethod
+        def get_item_art(item_name: str) -> str:
+            return ""
+        
+        @staticmethod
+        def get_inventory_header() -> str:
+            return "=== YOUR INVENTORY ==="
+        
+        @staticmethod
+        def get_inventory_footer() -> str:
+            return "=================="
+        
+        @staticmethod
+        def get_score_display(score: int, moves: int) -> str:
+            return f"Score: {score} points in {moves} moves"
+        
+        @staticmethod
+        def get_help_banner() -> str:
+            return "=== HELP SYSTEM ==="
+        
+        @staticmethod
+        def get_victory_art() -> str:
+            return "*** CONGRATULATIONS! YOU WON! ***"
+        
+        @staticmethod
+        def get_separator(char: str = "=") -> str:
+            return char * 50
+        
+        @staticmethod
+        def get_welcome_message() -> str:
+            return "Welcome to Dunnet! Type 'help' for commands or 'quit' to exit."
+
 # Type aliases for better readability
 CommandFunction: TypeAlias = Callable[["GameState", list[str]], "GameResult"]
 ItemDict: TypeAlias = dict[str, "Item"]
@@ -28,98 +81,6 @@ class Direction(Enum):
     NORTHWEST = "northwest"
     SOUTHEAST = "southeast"
     SOUTHWEST = "southwest"
-
-# Note: In practice, you would import AsciiArt from the separate ascii_art.py module
-# from ascii_art import AsciiArt, ArtType
-
-# For this demonstration, we'll create a simple reference class
-class AsciiArt:
-    """
-    Simplified ASCII art reference class.
-    In practice, import this from ascii_art.py module.
-    """
-    @staticmethod
-    def get_game_banner() -> str:
-        return """
-╔══════════════════════════════════════════════════════════╗
-║                                                          ║
-║    ██████╗ ██╗   ██╗███╗   ██╗███╗   ██╗███████╗████████║
-║    ██╔══██╗██║   ██║████╗  ██║████╗  ██║██╔════╝╚══██╔══║
-║    ██║  ██║██║   ██║██╔██╗ ██║██╔██╗ ██║█████╗     ██║  ║
-║    ██║  ██║██║   ██║██║╚██╗██║██║╚██╗██║██╔══╝     ██║  ║
-║    ██████╔╝╚██████╔╝██║ ╚████║██║ ╚████║███████╗   ██║  ║
-║    ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═══╝╚══════╝   ╚═╝  ║
-║                                                          ║
-║               A D V E N T U R E   G A M E                ║
-║                                                          ║
-╚══════════════════════════════════════════════════════════╝
-        """
-    
-    @staticmethod
-    def center_art(art: str) -> str:
-        """Simple centering - in practice, use the full implementation from ascii_art.py"""
-        return art
-    
-    @staticmethod
-    def get_room_art(room_id: str) -> str:
-        """Get room art - in practice, use the full implementation from ascii_art.py"""
-        return ""  # Simplified for this example
-    
-    @staticmethod
-    def get_item_art(item_name: str) -> str:
-        """Get item art - in practice, use the full implementation from ascii_art.py"""
-        return ""  # Simplified for this example
-    
-    @staticmethod
-    def get_inventory_header() -> str:
-        return "┌─ 🎒 YOUR INVENTORY 🎒 ─┐"
-    
-    @staticmethod
-    def get_inventory_footer() -> str:
-        return "└────────────────────────┘"
-    
-    @staticmethod
-    def get_score_display(score: int, moves: int) -> str:
-        return f"""
-┌─ 📊 GAME STATS 📊 ─┐
-│ Score: {score:>3} points  │
-│ Moves: {moves:>3} steps   │
-└──────────────────────┘
-        """
-    
-    @staticmethod
-    def get_help_banner() -> str:
-        return """
-╔═══════════════════════════════════╗
-║         🆘 HELP SYSTEM 🆘         ║
-╚═══════════════════════════════════╝
-        """
-    
-    @staticmethod
-    def get_victory_art() -> str:
-        return """
-    ✨🎉 CONGRATULATIONS! 🎉✨
-    
-    ██╗   ██╗ ██████╗ ██╗   ██╗
-    ╚██╗ ██╔╝██╔═══██╗██║   ██║
-     ╚████╔╝ ██║   ██║██║   ██║
-      ╚██╔╝  ██║   ██║██║   ██║
-       ██║   ╚██████╔╝╚██████╔╝
-       ╚═╝    ╚═════╝  ╚═════╝
-    
-    ██╗    ██╗ ██████╗ ███╗   ██╗
-    ██║    ██║██╔═══██╗████╗  ██║
-    ██║ █╗ ██║██║   ██║██╔██╗ ██║
-    ██║███╗██║██║   ██║██║╚██╗██║
-    ╚███╔███╔╝╚██████╔╝██║ ╚████║
-     ╚══╝╚══╝  ╚═════╝ ╚═╝  ╚═══╝
-    
-       🏆 DUNNET MASTER! 🏆
-        """
-    
-    @staticmethod
-    def get_separator(char: str = "═") -> str:
-        return char * 50
 
 @dataclass(frozen=True)
 class GameResult:
@@ -688,19 +649,16 @@ class DunnetGame:
             "Use 'look' to examine your surroundings.",
             "Type 'inventory' to see what you're carrying."
         ]
-        return GameResult(f"I don't understand that command. {random.choice(suggestions)}")
+        return GameResult(f"I don't understand your words human. Try another command! {random.choice(suggestions)}")
 
 def main() -> None:
-    """Main game loop with ASCII art"""
+    """Main game loop with ASCII art from external module"""
     # Clear screen and show banner
     print("\033[2J\033[H")  # ANSI clear screen
     print(AsciiArt.get_game_banner())
     print()
-    print(AsciiArt.center_art("Welcome to Dunnet! Type 'help' for commands or 'quit' to exit."))
+    print(AsciiArt.center_art(AsciiArt.get_welcome_message()))
     print(AsciiArt.get_separator())
-    print()
-    print("📝 Note: For the full ASCII art experience, save ascii_art.py separately")
-    print("    and import with: from ascii_art import AsciiArt")
     print()
     
     game = DunnetGame()
@@ -725,7 +683,7 @@ def main() -> None:
                 
         except KeyboardInterrupt:
             print("\n")
-            print(AsciiArt.center_art("Thanks for playing Dunnet! 👋"))
+            print(AsciiArt.center_art("You will never succeed with that kind of attitude. Thanks for playing Dunnet! 👋"))
             break
         except EOFError:
             print("\n")
